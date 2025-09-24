@@ -1,0 +1,44 @@
+name: Build and deploy application
+
+on:
+  push:
+    branches:
+      - main
+
+# This simulates the build and deploy (CD) of the application in Azure App Services
+# This should restore .NET NuGet packages, run EF Core migrations and create the publish build to be deployed.
+# Ideally there would be one YAML script for each environment used
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: .NET Setup
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Install Entity Framework Core CLI
+        run: dotnet tool install --global dotnet-ef --version 8.0.0
+
+      # The connection string needs to be defined on the repository secrets to run the update on the database based on EF Core migrations
+      - name: Update Database with Entity Framework Core migrations
+        run: dotnet ef database update --project BloggingPlatform.Infrastructure/BloggingPlatform.Infrastructure.Data.csproj --startup-project BloggingPlatform.Api/BloggingPlatform.Api.csproj --connection-string "${{ secrets.ConnectionString }}"
+        env:
+          DefaultConnection: ${{ secrets.ConnectionString }}
+
+      # This builds the API and set the publish version to be deployed 
+      - name: Build and Publish
+        run: dotnet publish BloggingPlatform.Api.csproj -c Release -o BloggingPlatform.Api/bin/Release/net8.0/publish
+
+      # Example
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: blogging-platform-api
+          # This should be retrieved from the App Service Publish Settings
+          publish-profile: blogging-platform-api-publish-profile
+          package: BloggingPlatform.Api/bin/Release/net8.0/publish

@@ -1,0 +1,32 @@
+name: CI Build and Test application
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+# This defines the Continuous Integration script of the application
+# This should restore .NET NuGet packages, review for vulnerabilities, build and test the application
+jobs:
+  buildandtest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Dependency Review
+        uses: actions/dependency-review-action@v4
+
+      - name: Build project
+        run: dotnet build --configuration Release --no-restore
+      
+      - name: Run tests
+        run: dotnet test
+
+      # Here third party applications could be used to run and evaluate security issues, code coverage and others (as SonarQube or Snyk)
+
