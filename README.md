@@ -46,6 +46,7 @@ Here is the expected body payload for token generation
   "email": "user@user.com",
   "password": "pass"
 }
+```
 
 The generated token should be used as a Bearer token in the Authorization header or, if using Swagger, can be added in the top-right Authorize button configuration.
 
