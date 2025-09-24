@@ -1,9 +1,11 @@
 name: Build and deploy application
 
+
+# Runs when code is pushed to "release" branch
 on:
   push:
     branches:
-      - main
+      - release
 
 # This simulates the build and deploy (CD) of the application in Azure App Services
 # This should restore .NET NuGet packages, run EF Core migrations and create the publish build to be deployed.
@@ -19,14 +21,14 @@ jobs:
           dotnet-version: 8.0.x
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore src/BloggingPlatform.sln
 
       - name: Install Entity Framework Core CLI
         run: dotnet tool install --global dotnet-ef --version 8.0.0
 
       # The connection string needs to be defined on the repository secrets to run the update on the database based on EF Core migrations
       - name: Update Database with Entity Framework Core migrations
-        run: dotnet ef database update --project BloggingPlatform.Infrastructure/BloggingPlatform.Infrastructure.Data.csproj --startup-project BloggingPlatform.Api/BloggingPlatform.Api.csproj --connection-string "${{ secrets.ConnectionString }}"
+        run: dotnet ef database update --project src/BloggingPlatform.Infrastructure/BloggingPlatform.Infrastructure.Data.csproj --startup-project src/BloggingPlatform.Api/BloggingPlatform.Api.csproj --connection-string "${{ secrets.ConnectionString }}"
         env:
           DefaultConnection: ${{ secrets.ConnectionString }}
 

@@ -50,6 +50,11 @@ Here is the expected body payload for token generation
 
 The generated token should be used as a Bearer token in the Authorization header or, if using Swagger, can be added in the top-right Authorize button configuration.
 
+## CI/CD processes
+Two different YAML files were added under .github/workflows: **build-validation.yml** and **deploy.yml**. 
+
+Those are placeholder workflow files to be used during CI/CD processes. More information and comments were added under each of the workflow files.
+
 # Next Steps
 * Add more functional resources to the application
     * Add support to reactions to BlogPosts and Comments. Every BlogPost and Comments would have a list of reactions related with it, with the reaction type being: Like, Loved, Funny and others.
