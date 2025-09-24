@@ -1,0 +1,13 @@
+﻿/src/.vs
+*.suo
+*.user
+*.pdb
+*.obj
+*.exe
+*.dll
+Debug/
+Release/
+bin/
+obj/
+*.nupkg
+.nupkg/
