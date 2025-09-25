@@ -1,29 +1,14 @@
-﻿using BloggingPlatform.Domain.Entities;
-using BloggingPlatform.Infrastructure.Data.Repositories;
+﻿using BloggingPlatform.Infrastructure.Data.Repositories;
 using BloggingPlatform.Tests.Factories;
+using BloggingPlatform.Tests.Fixtures;
 using BloggingPlatform.Tests.Utils;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace BloggingPlatform.Tests.Repositories
 {
-    public class BlogPostRepositoryTests
+    public class BlogPostRepositoryTests : IClassFixture<ConfigurationFixture>
     {
-        [Fact]
-        public async Task Handle_AddAsync_ReturnsObject()
-        {
-            using var context = BloggingPlatformDbContextFixture.GetDbContext();
-            var repository = new BlogPostRepository(context);
-            var blogPostEntity = BlogPostFactory.GenerateBlogPostEntity();
-
-            await repository.AddAsync(blogPostEntity);
-            await context.SaveChangesAsync();
-
-            var queriedBlogPost = await context.BlogPosts.FirstOrDefaultAsync(p => p.Id == blogPostEntity.Id);
-            Assert.NotNull(queriedBlogPost);
-            Assert.Equal("Post Title 1", queriedBlogPost.Title);
-        }
-
         [Fact]
         public async Task Handle_GetPagintedAsync_ReturnsObject()
         {
@@ -41,6 +26,22 @@ namespace BloggingPlatform.Tests.Repositories
             Assert.NotNull(retrievedPaginatedBlogPosts);
             Assert.Equal(1, retrievedPaginatedBlogPosts.Total);
             Assert.Contains(blogPostEntity.Title, retrievedPaginatedBlogPosts.Data.Select(x => x.Title));
+        }
+
+
+        [Fact]
+        public async Task Handle_AddAsync_ReturnsObject()
+        {
+            using var context = BloggingPlatformDbContextFixture.GetDbContext();
+            var repository = new BlogPostRepository(context);
+            var blogPostEntity = BlogPostFactory.GenerateBlogPostEntity();
+
+            await repository.AddAsync(blogPostEntity);
+            await context.SaveChangesAsync();
+
+            var queriedBlogPost = await context.BlogPosts.FirstOrDefaultAsync(p => p.Id == blogPostEntity.Id);
+            Assert.NotNull(queriedBlogPost);
+            Assert.Equal(blogPostEntity.Title, queriedBlogPost.Title);
         }
 
 

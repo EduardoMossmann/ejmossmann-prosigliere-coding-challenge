@@ -14,6 +14,7 @@ using Microsoft.Extensions.Logging;
 using BloggingPlatform.Application.FilterParams;
 using BloggingPlatform.Domain;
 using BloggingPlatform.Tests.Factories;
+using Microsoft.AspNetCore.Http;
 
 namespace BloggingPlatform.Tests.Services
 {
@@ -24,6 +25,7 @@ namespace BloggingPlatform.Tests.Services
         private readonly IMapper _mapper;
         private readonly CommentRequestValidator _commentRequestValidator;
         private readonly BlogPostRequestValidator _blogPostRequestValidator;
+        private readonly Mock<IHttpContextAccessor> _httpContextAccessor;
         private readonly Mock<ILogger<BlogPostService>> _loggerMock;
         public BlogPostServiceTests(ConfigurationFixture configurationFixture)
         {
@@ -32,13 +34,14 @@ namespace BloggingPlatform.Tests.Services
             _commentRequestValidator = new CommentRequestValidator();
             _blogPostRequestValidator = new BlogPostRequestValidator();
             _loggerMock = new Mock<ILogger<BlogPostService>>();
+            _httpContextAccessor = new Mock<IHttpContextAccessor>();
         }
 
         [Fact]
         public async Task Handle_GetAsync_ShouldCallGetPaginatedAsyncOnRepository()
         {
             var service = new BlogPostService(_blogPostRepositoryMock.Object, _mapper,
-                _commentRequestValidator, _blogPostRequestValidator, _loggerMock.Object);
+                _commentRequestValidator, _blogPostRequestValidator, _loggerMock.Object, _httpContextAccessor.Object);
 
             var blogPostPaginatedResult = BlogPostFactory.GenerateBlogPostPaginatedResult();
 
@@ -55,7 +58,7 @@ namespace BloggingPlatform.Tests.Services
         public async Task Handle_PostAsync_ShouldCallAddAsyncOnRepository()
         {
             var service = new BlogPostService(_blogPostRepositoryMock.Object, _mapper,
-                _commentRequestValidator, _blogPostRequestValidator, _loggerMock.Object);
+                _commentRequestValidator, _blogPostRequestValidator, _loggerMock.Object, _httpContextAccessor.Object);
             var blogPostRequest = BlogPostFactory.GenerateBlogPostRequest();
 
             await service.PostAsync(blogPostRequest);
@@ -67,7 +70,7 @@ namespace BloggingPlatform.Tests.Services
         public async Task Handle_GetByIdAsync_ShouldCallGetByIdAsyncOnRepository()
         {
             var service = new BlogPostService(_blogPostRepositoryMock.Object, _mapper,
-                _commentRequestValidator, _blogPostRequestValidator, _loggerMock.Object);
+                _commentRequestValidator, _blogPostRequestValidator, _loggerMock.Object, _httpContextAccessor.Object);
 
             var blogPostEntity = BlogPostFactory.GenerateBlogPostEntity();
 
@@ -83,7 +86,7 @@ namespace BloggingPlatform.Tests.Services
         public async Task Handle_PostCommentsAsync_ShouldCallGetByIdAsyncOnRepository()
         {
             var service = new BlogPostService(_blogPostRepositoryMock.Object, _mapper,
-                _commentRequestValidator, _blogPostRequestValidator, _loggerMock.Object);
+                _commentRequestValidator, _blogPostRequestValidator, _loggerMock.Object, _httpContextAccessor.Object);
 
             var blogPostEntity = BlogPostFactory.GenerateBlogPostEntity();
 
